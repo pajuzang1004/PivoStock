@@ -5,159 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>1차피보하락계산</title>
   <style>
+    /* 화면 디자인(CSS) 영역: 요소들의 크기, 색상, 배치 등을 설정합니다. */
     * { box-sizing: border-box; }
     body {
-      font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
-      max-width: 680px;
+      font-family: 'Malgun Gothic', -apple-system, sans-serif;
+      max-width: 600px;
       margin: 30px auto;
       padding: 20px;
       background-color: #f4f6f9;
       color: #333;
     }
-    .card {
-      background: #ffffff;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-    h2 {
-      margin-top: 0;
-      text-align: center;
-      color: #1a73e8;
-      font-size: 22px;
-      margin-bottom: 16px;
-    }
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: #555;
-    }
-    /* 분봉/일봉 선택 버튼 그리드 */
-    .tf-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-    .tf-btn {
-      padding: 10px 8px;
-      background: #f1f3f4;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s;
-    }
-    .tf-btn:hover {
-      background: #e8f0fe;
-      border-color: #90caf9;
-    }
-    .tf-btn.active {
-      background: #1a73e8;
-      color: #fff;
-      border-color: #1a73e8;
-      font-weight: bold;
-    }
-    .tf-name {
-      display: block;
-      font-size: 15px;
-      margin-bottom: 2px;
-    }
-    .tf-val {
-      display: block;
-      font-size: 12px;
-      opacity: 0.85;
-    }
-    /* 입력창 영역 */
-    .input-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-      align-items: flex-end;
-    }
-    .input-field {
-      flex: 1;
-    }
-    input[type="number"], select {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    .summary-bar {
-      background: #f8f9fa;
-      border: 1px solid #e9ecef;
-      padding: 10px 14px;
-      border-radius: 6px;
-      font-size: 14px;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    /* 라인 차트 영역 */
-    .chart-box {
-      position: relative;
-      height: 350px;
-      background: #1e222d;
-      border-radius: 8px;
-      margin-top: 10px;
-      padding: 20px;
-      overflow: hidden;
-    }
-    .fib-zone {
-      position: absolute;
-      left: 0;
-      right: 0;
-      pointer-events: none;
-    }
-    .fib-line {
-      position: absolute;
-      left: 20px;
-      right: 20px;
-      border-top: 2px solid;
-      transition: top 0.3s ease;
-    }
-    .fib-label {
-      position: absolute;
-      right: 25px;
-      transform: translateY(-100%);
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: bold;
-      color: #fff;
-      margin-top: -5px;
-      display: flex;
-      justify-content: space-between;
-      width: calc(100% - 50px);
-    }
-    /* 결과 표 영역 */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 14px;
-    }
-    th, td {
-      border: 1px solid #e0e0e0;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #f8f9fa;
-      font-weight: bold;
-    }
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 4px;
-      color: white;
-      font-weight: bold;
-      font-size: 12px;
-    }
+    /* (중략 - 기존 CSS 스타일과 동일하므로 디자인 코드는 그대로 유지합니다) */
+    .card { background: #ffffff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    h2 { margin-top: 0; text-align: center; color: #1a73e8; font-size: 22px; margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #555; }
+    .tf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
+    .tf-btn { padding: 10px 8px; background: #f1f3f4; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; text-align: center; }
+    .tf-btn.active { background: #1a73e8; color: #fff; border-color: #1a73e8; font-weight: bold; }
+    .tf-name { display: block; font-size: 15px; margin-bottom: 2px; }
+    .tf-val { display: block; font-size: 12px; opacity: 0.85; }
+    .input-section { margin-bottom: 16px; }
+    input[type="number"] { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
+    .summary-bar { background: #f8f9fa; border: 1px solid #e9ecef; padding: 10px 14px; border-radius: 6px; font-size: 14px; display: flex; justify-content: space-between; margin-bottom: 16px; }
+    .chart-box { position: relative; height: 380px; background: #1e222d; border-radius: 8px; padding: 20px; overflow: hidden; }
+    .fib-zone { position: absolute; left: 0; right: 0; pointer-events: none; }
+    .fib-line { position: absolute; left: 20px; right: 20px; border-top: 2px solid; }
+    .fib-label { position: absolute; right: 25px; transform: translateY(-100%); padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: bold; color: #fff; margin-top: -5px; display: flex; justify-content: space-between; width: calc(100% - 50px); }
   </style>
 </head>
 <body>
@@ -165,215 +38,160 @@
 <div class="card">
   <h2>1차피보하락계산</h2>
 
-  <!-- 1. 분봉 / 일봉 선택 버튼 -->
-  <label>1. 기준봉 선택 (클릭 시 해당 비율 F 자동 적용)</label>
-  <div class="tf-grid" id="tfGrid">
-    <div class="tf-btn active" data-name="일봉" data-val="5.10647">
-      <span class="tf-name">일봉</span>
-      <span class="tf-val">F = 5.10647</span>
+  <!-- 1. 기준봉 선택 버튼 영역 -->
+  <!-- onclick="..." 속성을 통해 버튼을 누르면 즉시 selectTF() 함수가 실행됩니다. -->
+  <label>1. 기준봉 선택</label>
+  <div class="tf-grid">
+    <div class="tf-btn active" id="btn_일봉" onclick="selectTF('일봉', 5.10647)">
+      <span class="tf-name">일봉</span><span class="tf-val">F = 5.10647</span>
     </div>
-    <div class="tf-btn" data-name="135분봉" data-val="2.77815">
-      <span class="tf-name">135분봉</span>
-      <span class="tf-val">F = 2.77815</span>
+    <div class="tf-btn" id="btn_135분봉" onclick="selectTF('135분봉', 2.77815)">
+      <span class="tf-name">135분봉</span><span class="tf-val">F = 2.77815</span>
     </div>
-    <div class="tf-btn" data-name="40분봉" data-val="1.96790">
-      <span class="tf-name">40분봉</span>
-      <span class="tf-val">F = 1.96790</span>
+    <div class="tf-btn" id="btn_40분봉" onclick="selectTF('40분봉', 1.96790)">
+      <span class="tf-name">40분봉</span><span class="tf-val">F = 1.96790</span>
     </div>
-    <div class="tf-btn" data-name="14분봉" data-val="1.57262">
-      <span class="tf-name">14분봉</span>
-      <span class="tf-val">F = 1.57262</span>
+    <div class="tf-btn" id="btn_14분봉" onclick="selectTF('14분봉', 1.57262)">
+      <span class="tf-name">14분봉</span><span class="tf-val">F = 1.57262</span>
     </div>
-    <div class="tf-btn" data-name="5분봉" data-val="1.34221">
-      <span class="tf-name">5분봉</span>
-      <span class="tf-val">F = 1.34221</span>
+    <div class="tf-btn" id="btn_5분봉" onclick="selectTF('5분봉', 1.34221)">
+      <span class="tf-name">5분봉</span><span class="tf-val">F = 1.34221</span>
     </div>
-    <div class="tf-btn" data-name="2분봉" data-val="1.21643">
-      <span class="tf-name">2분봉</span>
-      <span class="tf-val">F = 1.21643</span>
+    <div class="tf-btn" id="btn_2분봉" onclick="selectTF('2분봉', 1.21643)">
+      <span class="tf-name">2분봉</span><span class="tf-val">F = 1.21643</span>
     </div>
   </div>
 
-  <!-- 2. 고점 입력 및 비율 선택 -->
-  <div class="input-row">
-    <div class="input-field" style="flex: 2;">
-      <label for="upP">2. 고점 기준값 입력 (0.0 기준)</label>
-      <input type="number" id="upP" value="10000" step="any">
-    </div>
-    <div class="input-field" style="flex: 1;">
-      <label for="midRatio">2번째 구간 비율</label>
-      <select id="midRatio">
-        <option value="0.382" selected>0.382 (표준)</option>
-        <option value="0.318">0.318 (요청값)</option>
-      </select>
-    </div>
+  <!-- 2. 고점 입력 영역 -->
+  <!-- oninput="..." 속성 덕분에 숫자를 타이핑할 때마다 즉시 calcAndDraw() 함수가 실행되어 차트가 업데이트됩니다. -->
+  <div class="input-section">
+    <label for="upP">2. 고점 기준값 입력 (0.0 기준)</label>
+    <input type="number" id="upP" value="10000" step="any" oninput="calcAndDraw()">
   </div>
 
-  <!-- 선택된 기준 요약 바 -->
+  <!-- 요약 정보(선택 기준, 산출 저점)가 표시될 공간 -->
   <div class="summary-bar" id="summaryBar"></div>
 
-  <!-- 구분별 라인 차트 영역 (0.0 -> 0.382 -> 0.618 -> 1.0 순서) -->
+  <!-- 차트의 수평선과 배경색이 실제로 그려질 캔버스(공간) -->
   <div class="chart-box" id="chartBox"></div>
-
-  <!-- 수치 요약 표 -->
-  <table>
-    <thead>
-      <tr>
-        <th>순서</th>
-        <th>구간 구분</th>
-        <th>적용 수식 (F = 기준비율)</th>
-        <th>계산 결과값</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
 </div>
 
+<!-- 기능(자바스크립트) 영역 -->
 <script>
+  // 기본 설정값 (처음 화면이 열릴 때는 '일봉'을 기준으로 시작함)
   let currentTFName = '일봉';
   let currentF = 5.10647;
 
-  // DOM 로드 완료 후 이벤트 리스너 연결
-  document.addEventListener('DOMContentLoaded', function() {
-    // 분봉 버튼 클릭 이벤트 설정
+  // [버튼 클릭 이벤트 처리 함수] 
+  // 버튼을 누를 때마다 어떤 분봉/일봉인지 이름(name)과 비율(val)을 받아옵니다.
+  function selectTF(name, val) {
+    currentTFName = name; // 선택된 기준명 업데이트
+    currentF = val;       // 선택된 기준 비율 업데이트
+
+    // 모든 버튼에서 파란색 배경('active' 클래스)을 지워 초기화합니다.
     const buttons = document.querySelectorAll('.tf-btn');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        buttons.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        
-        currentTFName = this.getAttribute('data-name');
-        currentF = parseFloat(this.getAttribute('data-val'));
-        
-        drawFibonacci();
-      });
-    });
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].classList.remove('active');
+    }
 
-    // 입력값 변경 이벤트 연결
-    document.getElementById('upP').addEventListener('input', drawFibonacci);
-    document.getElementById('midRatio').addEventListener('change', drawFibonacci);
+    // 방금 클릭한 버튼에만 파란색 배경('active' 클래스)을 칠해줍니다.
+    const selectedBtn = document.getElementById('btn_' + name);
+    if (selectedBtn) {
+      selectedBtn.classList.add('active');
+    }
 
-    // 초기 실행
-    drawFibonacci();
-  });
+    // 선택이 바뀌었으니 새로운 기준으로 계산과 차트 그리기를 다시 실행합니다.
+    calcAndDraw();
+  }
 
-  function drawFibonacci() {
+  // [핵심: 피보나치 계산 및 차트 그리기 함수]
+  function calcAndDraw() {
+    // 1. 사용자가 입력한 고점값을 가져와 숫자로 변환합니다.
     const upPInput = document.getElementById('upP').value;
     const upP = parseFloat(upPInput);
-    const secondRatio = parseFloat(document.getElementById('midRatio').value);
 
+    // 값이 비어있거나 0보다 작으면 계산을 중단합니다.
     if (isNaN(upP) || upP <= 0) {
       return;
     }
 
-    // 1. 고점(upP)과 선택된 비율(F)로 저점(downP) 자동 산출 (1.0 기준)
+    // 2. 수식 계산
+    // (고점 / 저점 = 기준비율 F) 공식을 역산하여 저점을 자동 산출합니다.
     const downP = upP / currentF;
 
-    // 2. 0.0 -> 0.382(또는 0.318) -> 0.618 -> 1.0 값 계산[cite: 1, 2, 3, 4]
-    const val0_0    = upP;
-    const valSecond = downP * Math.pow(currentF, secondRatio);
-    const val0_618  = downP * Math.pow(currentF, 0.618);[cite: 1, 2]
-    const val1_0    = downP;
+    // 기하평균 피보나치 수식 (저점 * (고점/저점)^비율) 적용[cite: 2, 4, 5]
+    // 0.0, 0.382, 0.618, 1.0 구간의 실제 가격 값을 구합니다.
+    const val0_0   = upP;
+    const val0_382 = downP * Math.pow(currentF, 0.382);
+    const val0_618 = downP * Math.pow(currentF, 0.618);
+    const val1_0   = downP;
 
-    // 요약 바 업데이트
-    document.getElementById('summaryBar').innerHTML = `
-      <span>선택 기준: <strong>${currentTFName} (F = ${currentF})</strong></span>
-      <span>산출 저점(1.0): <strong>${Number(downP.toFixed(4)).toLocaleString('ko-KR')}</strong></span>
-    `;
+    // 3. 계산된 저점값을 화면의 요약 바에 텍스트로 찍어줍니다. (소수점 4자리 반올림)
+    document.getElementById('summaryBar').innerHTML = 
+      '<span>선택 기준: <strong>' + currentTFName + ' (F = ' + currentF + ')</strong></span>' +
+      '<span>산출 저점(1.0): <strong>' + Number(downP.toFixed(4)).toLocaleString('ko-KR') + '</strong></span>';
 
-    // 위에서 아래로 0.0 -> 0.382(0.318) -> 0.618 -> 1.0 순서로 배치
+    // 4. 차트에 그릴 4개의 구간 데이터를 배열로 정리합니다.
+    // posRatio는 차트 상에서 맨 위(0.0)부터 맨 아래(1.0)까지 선이 위치할 비율을 의미합니다.
     const levels = [
-      {
-        order: 1,
-        name: '0.0',
-        desc: '0.0 (고점 기준)',
-        formula: '입력 고점 (upP)',
-        value: val0_0,
-        color: '#ef5350', // 빨강
-        posRatio: 0.0
-      },
-      {
-        order: 2,
-        name: secondRatio.toString(),
-        desc: `${secondRatio} 구간`,
-        formula: `저점 * pow(${currentF}, ${secondRatio})`,
-        value: valSecond,
-        color: '#26a69a', // 초록
-        posRatio: secondRatio
-      },
-      {
-        order: 3,
-        name: '0.618',
-        desc: '0.618 구간',
-        formula: `저점 * pow(${currentF}, 0.618)`,
-        value: val0_618,
-        color: '#ffa726', // 주황
-        posRatio: 0.618
-      },
-      {
-        order: 4,
-        name: '1.0',
-        desc: '1.0 (저점 기준)',
-        formula: `고점 / ${currentF}`,
-        value: val1_0,
-        color: '#42a5f5', // 파랑
-        posRatio: 1.0
-      }
+      { name: '0.0 (고점)', value: val0_0, color: '#ef5350', posRatio: 0.0 },
+      { name: '0.382 구간', value: val0_382, color: '#26a69a', posRatio: 0.382 },
+      { name: '0.618 구간', value: val0_618, color: '#ffa726', posRatio: 0.618 },
+      { name: '1.0 (저점)', value: val1_0, color: '#42a5f5', posRatio: 1.0 }
     ];
 
+    // 기존 차트 화면을 깨끗하게 지웁니다.
     const chartBox = document.getElementById('chartBox');
-    const tableBody = document.getElementById('tableBody');
     chartBox.innerHTML = '';
-    tableBody.innerHTML = '';
 
-    const topPadding = 14;
-    const usableHeight = 76;
+    // 선들이 캔버스 테두리에 바짝 붙지 않도록 위아래 14%씩 여백을 둡니다.
+    const topPadding = 14; 
+    const usableHeight = 76; // 실제 선이 그려지는 공간(100 - 14 - 10)
 
-    // 배경 영역 칠하기
+    // 5. 각 구간 사이의 반투명 배경색을 칠하는 반복문
     for (let i = 0; i < levels.length - 1; i++) {
-      const top1 = topPadding + (levels[i].posRatio * usableHeight);
-      const top2 = topPadding + (levels[i + 1].posRatio * usableHeight);
+      const top1 = topPadding + (levels[i].posRatio * usableHeight); // 윗 선의 위치
+      const top2 = topPadding + (levels[i + 1].posRatio * usableHeight); // 아랫 선의 위치
+      
       const zone = document.createElement('div');
       zone.className = 'fib-zone';
-      zone.style.top = top1 + '%';
-      zone.style.height = (top2 - top1) + '%';
-      zone.style.backgroundColor = levels[i].color;
-      zone.style.opacity = '0.08';
+      zone.style.top = top1 + '%'; 
+      zone.style.height = (top2 - top1) + '%'; // 구간의 높이 설정
+      zone.style.backgroundColor = levels[i].color; // 해당 레벨의 색상 적용
+      zone.style.opacity = '0.08'; // 8% 투명도로 연하게 표시
       chartBox.appendChild(zone);
     }
 
-    // 라인 및 표 생성
-    levels.forEach(item => {
-      const topPercent = topPadding + (item.posRatio * usableHeight);
+    // 6. 4개의 수평선과 글자(수치) 라벨을 그리는 반복문
+    for (let j = 0; j < levels.length; j++) {
+      const item = levels[j];
+      const topPercent = topPadding + (item.posRatio * usableHeight); // 선이 그려질 Y좌표
       const formattedVal = Number(item.value.toFixed(4)).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 
+      // 선(Line) 요소 생성
       const line = document.createElement('div');
       line.className = 'fib-line';
       line.style.top = topPercent + '%';
       line.style.borderColor = item.color;
 
+      // 글자(Label) 요소 생성 (ex: "0.382 구간   9231.0000")
       const label = document.createElement('div');
       label.className = 'fib-label';
       label.style.top = topPercent + '%';
-      label.innerHTML = `
-        <span style="color: ${item.color};">[${item.order}] ${item.desc}</span>
-        <span style="background: ${item.color}; padding: 1px 8px; border-radius: 3px;">${formattedVal}</span>
-      `;
+      label.innerHTML = 
+        '<span style="color: ' + item.color + ';">' + item.name + '</span>' +
+        '<span style="background: ' + item.color + '; padding: 1px 8px; border-radius: 3px;">' + formattedVal + '</span>';
 
+      // 만들어진 선과 글자를 차트 박스 안에 집어넣어 화면에 표시합니다.
       chartBox.appendChild(line);
       chartBox.appendChild(label);
-
-      const row = `
-        <tr>
-          <td><strong>${item.order}</strong></td>
-          <td><span class="badge" style="background-color: ${item.color};">${item.name}</span></td>
-          <td style="color: #555; font-family: monospace;">${item.formula}</td>
-          <td style="font-weight: bold; font-size: 15px;">${formattedVal}</td>
-        </tr>
-      `;
-      tableBody.innerHTML += row;
-    });
+    }
   }
+
+  // 브라우저 창이 켜지고 파일 로딩이 완료되면, 아무것도 안 눌러도 최초 1회 자동으로 계산을 실행합니다.
+  window.onload = function() {
+    calcAndDraw();
+  };
 </script>
 
 </body>
