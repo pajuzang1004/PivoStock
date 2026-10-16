@@ -168,27 +168,27 @@
   <!-- 1. 분봉 / 일봉 선택 버튼 -->
   <label>1. 기준봉 선택 (클릭 시 해당 비율 F 자동 적용)</label>
   <div class="tf-grid" id="tfGrid">
-    <div class="tf-btn active" onclick="selectTimeframe('일봉', 5.10647, this)">
+    <div class="tf-btn active" data-name="일봉" data-val="5.10647">
       <span class="tf-name">일봉</span>
       <span class="tf-val">F = 5.10647</span>
     </div>
-    <div class="tf-btn" onclick="selectTimeframe('135분봉', 2.77815, this)">
+    <div class="tf-btn" data-name="135분봉" data-val="2.77815">
       <span class="tf-name">135분봉</span>
       <span class="tf-val">F = 2.77815</span>
     </div>
-    <div class="tf-btn" onclick="selectTimeframe('40분봉', 1.96790, this)">
+    <div class="tf-btn" data-name="40분봉" data-val="1.96790">
       <span class="tf-name">40분봉</span>
       <span class="tf-val">F = 1.96790</span>
     </div>
-    <div class="tf-btn" onclick="selectTimeframe('14분봉', 1.57262, this)">
+    <div class="tf-btn" data-name="14분봉" data-val="1.57262">
       <span class="tf-name">14분봉</span>
       <span class="tf-val">F = 1.57262</span>
     </div>
-    <div class="tf-btn" onclick="selectTimeframe('5분봉', 1.34221, this)">
+    <div class="tf-btn" data-name="5분봉" data-val="1.34221">
       <span class="tf-name">5분봉</span>
       <span class="tf-val">F = 1.34221</span>
     </div>
-    <div class="tf-btn" onclick="selectTimeframe('2분봉', 1.21643, this)">
+    <div class="tf-btn" data-name="2분봉" data-val="1.21643">
       <span class="tf-name">2분봉</span>
       <span class="tf-val">F = 1.21643</span>
     </div>
@@ -198,11 +198,11 @@
   <div class="input-row">
     <div class="input-field" style="flex: 2;">
       <label for="upP">2. 고점 기준값 입력 (0.0 기준)</label>
-      <input type="number" id="upP" value="10000" step="any" oninput="drawFibonacci()">
+      <input type="number" id="upP" value="10000" step="any">
     </div>
     <div class="input-field" style="flex: 1;">
       <label for="midRatio">2번째 구간 비율</label>
-      <select id="midRatio" onchange="drawFibonacci()">
+      <select id="midRatio">
         <option value="0.382" selected>0.382 (표준)</option>
         <option value="0.318">0.318 (요청값)</option>
       </select>
@@ -233,23 +233,33 @@
   let currentTFName = '일봉';
   let currentF = 5.10647;
 
-  window.onload = function() {
-    drawFibonacci();
-  };
-
-  function selectTimeframe(tfName, ratioValue, element) {
-    currentTFName = tfName;
-    currentF = ratioValue;
-
+  // DOM 로드 완료 후 이벤트 리스너 연결
+  document.addEventListener('DOMContentLoaded', function() {
+    // 분봉 버튼 클릭 이벤트 설정
     const buttons = document.querySelectorAll('.tf-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    element.classList.add('active');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        buttons.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        currentTFName = this.getAttribute('data-name');
+        currentF = parseFloat(this.getAttribute('data-val'));
+        
+        drawFibonacci();
+      });
+    });
 
+    // 입력값 변경 이벤트 연결
+    document.getElementById('upP').addEventListener('input', drawFibonacci);
+    document.getElementById('midRatio').addEventListener('change', drawFibonacci);
+
+    // 초기 실행
     drawFibonacci();
-  }
+  });
 
   function drawFibonacci() {
-    const upP = parseFloat(document.getElementById('upP').value);
+    const upPInput = document.getElementById('upP').value;
+    const upP = parseFloat(upPInput);
     const secondRatio = parseFloat(document.getElementById('midRatio').value);
 
     if (isNaN(upP) || upP <= 0) {
@@ -271,7 +281,7 @@
       <span>산출 저점(1.0): <strong>${Number(downP.toFixed(4)).toLocaleString('ko-KR')}</strong></span>
     `;
 
-    // 위에서 아래로 0.0 -> 0.382(0.318) -> 0.618 -> 1.0 순서로 배치 (하락 피보나치 관점)
+    // 위에서 아래로 0.0 -> 0.382(0.318) -> 0.618 -> 1.0 순서로 배치
     const levels = [
       {
         order: 1,
