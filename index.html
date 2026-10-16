@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>피보나치 구간 계산기 (0.0 → 0.618 → 0.382 → 1.0)</title>
+  <title>분봉·일봉 기준비율 피보나치 계산기</title>
   <style>
     * { box-sizing: border-box; }
     body {
       font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
-      max-width: 650px;
+      max-width: 680px;
       margin: 30px auto;
       padding: 20px;
       background-color: #f4f6f9;
@@ -25,24 +25,7 @@
       text-align: center;
       color: #1a73e8;
       font-size: 22px;
-    }
-    .order-info {
-      text-align: center;
-      font-size: 13px;
-      color: #666;
-      background: #f1f3f4;
-      padding: 8px;
-      border-radius: 6px;
-      margin-bottom: 18px;
-      font-weight: bold;
-    }
-    .input-group {
-      display: flex;
-      gap: 12px;
       margin-bottom: 16px;
-    }
-    .input-field {
-      flex: 1;
     }
     label {
       display: block;
@@ -51,35 +34,76 @@
       margin-bottom: 6px;
       color: #555;
     }
-    input[type="number"] {
+    /* 분봉/일봉 선택 버튼 그리드 */
+    .tf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .tf-btn {
+      padding: 10px 8px;
+      background: #f1f3f4;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .tf-btn:hover {
+      background: #e8f0fe;
+      border-color: #90caf9;
+    }
+    .tf-btn.active {
+      background: #1a73e8;
+      color: #fff;
+      border-color: #1a73e8;
+      font-weight: bold;
+    }
+    .tf-name {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+    .tf-val {
+      display: block;
+      font-size: 12px;
+      opacity: 0.85;
+    }
+    /* 입력창 영역 */
+    .input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: flex-end;
+    }
+    .input-field {
+      flex: 1;
+    }
+    input[type="number"], select {
       width: 100%;
       padding: 10px 12px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
     }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #1a73e8;
-      color: white;
-      border: none;
+    .summary-bar {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      padding: 10px 14px;
       border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background-color: #1557b0;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
     }
     /* 라인 차트 영역 */
     .chart-box {
       position: relative;
-      height: 360px;
+      height: 350px;
       background: #1e222d;
       border-radius: 8px;
-      margin-top: 24px;
+      margin-top: 10px;
       padding: 20px;
       overflow: hidden;
     }
@@ -139,34 +163,65 @@
 <body>
 
 <div class="card">
-  <h2>📈 피보나치 구간 계산 및 라인 차트</h2>
-  <div class="order-info">
-    구간 순서 (상 → 하): 0.0 (고점) ➔ 0.618 ➔ 0.382 ➔ 1.0 (저점)
+  <h2>📈 분봉·일봉 기준비율 피보나치 차트</h2>
+
+  <!-- 1. 분봉 / 일봉 선택 버튼 -->
+  <label>1. 기준봉 선택 (클릭 시 해당 비율 F 자동 적용)</label>
+  <div class="tf-grid" id="tfGrid">
+    <div class="tf-btn active" onclick="selectTimeframe('일봉', 5.10647, this)">
+      <span class="tf-name">일봉</span>
+      <span class="tf-val">F = 5.10647</span>
+    </div>
+    <div class="tf-btn" onclick="selectTimeframe('135분봉', 2.77815, this)">
+      <span class="tf-name">135분봉</span>
+      <span class="tf-val">F = 2.77815</span>
+    </div>
+    <div class="tf-btn" onclick="selectTimeframe('40분봉', 1.96790, this)">
+      <span class="tf-name">40분봉</span>
+      <span class="tf-val">F = 1.96790</span>
+    </div>
+    <div class="tf-btn" onclick="selectTimeframe('14분봉', 1.57262, this)">
+      <span class="tf-name">14분봉</span>
+      <span class="tf-val">F = 1.57262</span>
+    </div>
+    <div class="tf-btn" onclick="selectTimeframe('5분봉', 1.34221, this)">
+      <span class="tf-name">5분봉</span>
+      <span class="tf-val">F = 1.34221</span>
+    </div>
+    <div class="tf-btn" onclick="selectTimeframe('2분봉', 1.21643, this)">
+      <span class="tf-name">2분봉</span>
+      <span class="tf-val">F = 1.21643</span>
+    </div>
   </div>
 
-  <div class="input-group">
-    <div class="input-field">
-      <label for="upP">고점 기준값 (upP / 0.0)</label>
-      <input type="number" id="upP" placeholder="예: 10000" value="10000" step="any">
+  <!-- 2. 고점 입력 및 3번째 구간(0.382 / 0.318) 선택 -->
+  <div class="input-row">
+    <div class="input-field" style="flex: 2;">
+      <label for="upP">2. 고점 기준값 입력 (0.0 기준)</label>
+      <input type="number" id="upP" value="10000" step="any" oninput="drawFibonacci()">
     </div>
-    <div class="input-field">
-      <label for="downP">저점 기준값 (downP / 1.0)</label>
-      <input type="number" id="downP" placeholder="예: 5000" value="5000" step="any">
+    <div class="input-field" style="flex: 1;">
+      <label for="midRatio">3번째 구간 비율 선택</label>
+      <select id="midRatio" onchange="drawFibonacci()">
+        <option value="0.382" selected>0.382 (표준)</option>
+        <option value="0.318">0.318 (요청값)</option>
+      </select>
     </div>
   </div>
 
-  <button onclick="drawFibonacci()">계산 및 라인 그리기</button>
+  <!-- 선택된 기준 요약 바 -->
+  <div class="summary-bar" id="summaryBar"></div>
 
-  <!-- 구분별 라인이 그려지는 차트 영역 (0.0 -> 0.618 -> 0.382 -> 1.0 순서) -->
+  <!-- 구분별 라인 차트 영역 -->
   <div class="chart-box" id="chartBox"></div>
 
-  <!-- 수치 요약 표 (0.0 -> 0.618 -> 0.382 -> 1.0 순서) -->
+  <!-- 수치 요약 표 -->
   <table>
     <thead>
       <tr>
         <th>순서</th>
         <th>구간 구분</th>
-        <th>적용 수식</th>
+        <th>적용 수식 (F = 기준비율)</th>
         <th>계산 결과값</th>
       </tr>
     </thead>
@@ -175,62 +230,84 @@
 </div>
 
 <script>
+  let currentTFName = '일봉';
+  let currentF = 5.10647;
+
   window.onload = function() {
     drawFibonacci();
   };
 
+  function selectTimeframe(tfName, ratioValue, element) {
+    currentTFName = tfName;
+    currentF = ratioValue;
+
+    const buttons = document.querySelectorAll('.tf-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+
+    drawFibonacci();
+  }
+
   function drawFibonacci() {
     const upP = parseFloat(document.getElementById('upP').value);
-    const downP = parseFloat(document.getElementById('downP').value);
+    const thirdRatio = parseFloat(document.getElementById('midRatio').value);
 
-    if (isNaN(upP) || isNaN(downP) || upP <= 0 || downP <= 0) {
-      alert('고점과 저점에 0보다 큰 숫자를 입력해 주세요.');
+    if (isNaN(upP) || upP <= 0) {
       return;
     }
 
-    // 0.0 -> 0.618 -> 0.382 -> 1.0 순서대로 값 계산
+    // 1. 고점(upP)과 선택된 비율(F)로 저점(downP) 자동 산출
+    const downP = upP / currentF;
+
+    // 2. 0.0 -> 0.618 -> 0.382(또는 0.318) -> 1.0 값 계산
     const val0_0   = upP;
-    const val0_618 = downP * Math.pow(upP / downP, 0.618);
-    const val0_382 = downP * Math.pow(upP / downP, 0.382);
+    const val0_618 = downP * Math.pow(currentF, 0.618);
+    const valThird = downP * Math.pow(currentF, thirdRatio);
     const val1_0   = downP;
 
-    // 위에서 아래로 0.0 -> 0.618 -> 0.382 -> 1.0 순서 고정 배열
+    // 요약 바 업데이트
+    document.getElementById('summaryBar').innerHTML = `
+      <span>선택 기준: <strong>${currentTFName} (F = ${currentF})</strong></span>
+      <span>산출 저점(1.0): <strong>${Number(downP.toFixed(4)).toLocaleString('ko-KR')}</strong></span>
+    `;
+
+    // 위에서 아래로 0.0 -> 0.618 -> 0.382(0.318) -> 1.0 순서 고정
     const levels = [
       {
         order: 1,
         name: '0.0',
         desc: '0.0 (고점 기준)',
-        formula: '고점 (upP)',
+        formula: '입력 고점 (upP)',
         value: val0_0,
         color: '#ef5350', // 빨강
-        posRatio: 0.0     // 맨 위 (0%)
+        posRatio: 0.0
       },
       {
         order: 2,
         name: '0.618',
         desc: '0.618 구간',
-        formula: '저점 * pow(고점/저점, 0.618)',
+        formula: `저점 * pow(${currentF}, 0.618)`,
         value: val0_618,
         color: '#ffa726', // 주황
-        posRatio: 1 - 0.618 // 위에서 38.2% 지점
+        posRatio: 1 - 0.618
       },
       {
         order: 3,
-        name: '0.382',
-        desc: '0.382 구간',
-        formula: '저점 * pow(고점/저점, 0.382)',
-        value: val0_382,
+        name: thirdRatio.toString(),
+        desc: `${thirdRatio} 구간`,
+        formula: `저점 * pow(${currentF}, ${thirdRatio})`,
+        value: valThird,
         color: '#26a69a', // 초록
-        posRatio: 1 - 0.382 // 위에서 61.8% 지점
+        posRatio: 1 - thirdRatio
       },
       {
         order: 4,
         name: '1.0',
         desc: '1.0 (저점 기준)',
-        formula: '저점 (downP)',
+        formula: `고점 / ${currentF}`,
         value: val1_0,
         color: '#42a5f5', // 파랑
-        posRatio: 1.0     // 맨 아래 (100%)
+        posRatio: 1.0
       }
     ];
 
@@ -239,10 +316,10 @@
     chartBox.innerHTML = '';
     tableBody.innerHTML = '';
 
-    const topPadding = 14;   // 차트 상단 여백 (%)
-    const usableHeight = 76; // 차트 내부 라인 표시 높이 비율 (%)
+    const topPadding = 14;
+    const usableHeight = 76;
 
-    // 1. 구간별 배경 영역 칠하기
+    // 배경 영역 칠하기
     for (let i = 0; i < levels.length - 1; i++) {
       const top1 = topPadding + (levels[i].posRatio * usableHeight);
       const top2 = topPadding + (levels[i + 1].posRatio * usableHeight);
@@ -255,18 +332,16 @@
       chartBox.appendChild(zone);
     }
 
-    // 2. 0.0 -> 0.618 -> 0.382 -> 1.0 순서로 라인 및 표 생성
+    // 라인 및 표 생성
     levels.forEach(item => {
       const topPercent = topPadding + (item.posRatio * usableHeight);
       const formattedVal = Number(item.value.toFixed(4)).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 
-      // 차트 수평 라인
       const line = document.createElement('div');
       line.className = 'fib-line';
       line.style.top = topPercent + '%';
       line.style.borderColor = item.color;
 
-      // 차트 텍스트 라벨
       const label = document.createElement('div');
       label.className = 'fib-label';
       label.style.top = topPercent + '%';
@@ -278,7 +353,6 @@
       chartBox.appendChild(line);
       chartBox.appendChild(label);
 
-      // 하단 요약 표 행 추가
       const row = `
         <tr>
           <td><strong>${item.order}</strong></td>
