@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>분봉·일봉 기준비율 피보나치 계산기</title>
+  <title>1차피보하락계산</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -163,7 +163,7 @@
 <body>
 
 <div class="card">
-  <h2>📈 분봉·일봉 기준비율 피보나치 차트</h2>
+  <h2>1차피보하락계산</h2>
 
   <!-- 1. 분봉 / 일봉 선택 버튼 -->
   <label>1. 기준봉 선택 (클릭 시 해당 비율 F 자동 적용)</label>
@@ -194,14 +194,14 @@
     </div>
   </div>
 
-  <!-- 2. 고점 입력 및 3번째 구간(0.382 / 0.318) 선택 -->
+  <!-- 2. 고점 입력 및 비율 선택 -->
   <div class="input-row">
     <div class="input-field" style="flex: 2;">
       <label for="upP">2. 고점 기준값 입력 (0.0 기준)</label>
       <input type="number" id="upP" value="10000" step="any" oninput="drawFibonacci()">
     </div>
     <div class="input-field" style="flex: 1;">
-      <label for="midRatio">3번째 구간 비율 선택</label>
+      <label for="midRatio">2번째 구간 비율</label>
       <select id="midRatio" onchange="drawFibonacci()">
         <option value="0.382" selected>0.382 (표준)</option>
         <option value="0.318">0.318 (요청값)</option>
@@ -212,7 +212,7 @@
   <!-- 선택된 기준 요약 바 -->
   <div class="summary-bar" id="summaryBar"></div>
 
-  <!-- 구분별 라인 차트 영역 -->
+  <!-- 구분별 라인 차트 영역 (0.0 -> 0.382 -> 0.618 -> 1.0 순서) -->
   <div class="chart-box" id="chartBox"></div>
 
   <!-- 수치 요약 표 -->
@@ -250,20 +250,20 @@
 
   function drawFibonacci() {
     const upP = parseFloat(document.getElementById('upP').value);
-    const thirdRatio = parseFloat(document.getElementById('midRatio').value);
+    const secondRatio = parseFloat(document.getElementById('midRatio').value);
 
     if (isNaN(upP) || upP <= 0) {
       return;
     }
 
-    // 1. 고점(upP)과 선택된 비율(F)로 저점(downP) 자동 산출
+    // 1. 고점(upP)과 선택된 비율(F)로 저점(downP) 자동 산출 (1.0 기준)
     const downP = upP / currentF;
 
-    // 2. 0.0 -> 0.618 -> 0.382(또는 0.318) -> 1.0 값 계산
-    const val0_0   = upP;
-    const val0_618 = downP * Math.pow(currentF, 0.618);
-    const valThird = downP * Math.pow(currentF, thirdRatio);
-    const val1_0   = downP;
+    // 2. 0.0 -> 0.382(또는 0.318) -> 0.618 -> 1.0 값 계산[cite: 1, 2, 3, 4]
+    const val0_0    = upP;
+    const valSecond = downP * Math.pow(currentF, secondRatio);
+    const val0_618  = downP * Math.pow(currentF, 0.618);[cite: 1, 2]
+    const val1_0    = downP;
 
     // 요약 바 업데이트
     document.getElementById('summaryBar').innerHTML = `
@@ -271,7 +271,7 @@
       <span>산출 저점(1.0): <strong>${Number(downP.toFixed(4)).toLocaleString('ko-KR')}</strong></span>
     `;
 
-    // 위에서 아래로 0.0 -> 0.618 -> 0.382(0.318) -> 1.0 순서 고정
+    // 위에서 아래로 0.0 -> 0.382(0.318) -> 0.618 -> 1.0 순서로 배치 (하락 피보나치 관점)
     const levels = [
       {
         order: 1,
@@ -284,21 +284,21 @@
       },
       {
         order: 2,
+        name: secondRatio.toString(),
+        desc: `${secondRatio} 구간`,
+        formula: `저점 * pow(${currentF}, ${secondRatio})`,
+        value: valSecond,
+        color: '#26a69a', // 초록
+        posRatio: secondRatio
+      },
+      {
+        order: 3,
         name: '0.618',
         desc: '0.618 구간',
         formula: `저점 * pow(${currentF}, 0.618)`,
         value: val0_618,
         color: '#ffa726', // 주황
-        posRatio: 1 - 0.618
-      },
-      {
-        order: 3,
-        name: thirdRatio.toString(),
-        desc: `${thirdRatio} 구간`,
-        formula: `저점 * pow(${currentF}, ${thirdRatio})`,
-        value: valThird,
-        color: '#26a69a', // 초록
-        posRatio: 1 - thirdRatio
+        posRatio: 0.618
       },
       {
         order: 4,
