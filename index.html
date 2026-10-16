@@ -1,1 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>피보나치 구간 계산기 및 라인 차트</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 650px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+    .card {
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #1a73e8;
+      font-size: 22px;
+    }
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .input-field {
+      flex: 1;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #555;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background-color: #1557b0;
+    }
+    /* 라인 차트 영역 */
+    .chart-box {
+      position: relative;
+      height: 340px;
+      background: #1e222d;
+      border-radius: 8px;
+      margin-top: 24px;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .fib-zone {
+      position: absolute;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+    }
+    .fib-line {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      border-top: 2px solid;
+      transition: top 0.3s ease;
+    }
+    .fib-label {
+      position: absolute;
+      right: 25px;
+      transform: translateY(-100%);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #fff;
+      margin-top: -4px;
+      display: flex;
+      justify-content: space-between;
+      width: calc(100% - 50px);
+    }
+    /* 결과 표 영역 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #e0e0e0;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
 
+<div class="card">
+  <h2>📈 피보나치 구간 계산 및 라인 차트</h2>
+
+  <div class="input-group">
+    <div class="input-field">
+      <label for="upP">고점 기준값 (upP / 0.0 기준)</label>
+      <input type="number" id="upP" placeholder="예: 10000" value="10000" step="any">
+    </div>
+    <div class="input-field">
+      <label for="downP">저점 기준값 (downP / 1.0 기준)</label>
+      <input type="number" id="downP" placeholder="예: 5000" value="5000" step="any">
+    </div>
+  </div>
+
+  <button onclick="drawFibonacci()">계산 및 라인 그리기</button>
+
+  <!-- 구분별 라인이 그려지는 차트 영역 -->
+  <div class="chart-box" id="chartBox"></div>
+
+  <!-- 수치 요약 표 -->
+  <table>
+    <thead>
+      <tr>
+        <th>구분</th>
+        <th>적용 수식</th>
+        <th>계산 결과값</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<script>
+  window.onload = function() {
+    drawFibonacci();
+  };
+
+  function drawFibonacci() {
+    const upP = parseFloat(document.getElementById('upP').value);
+    const downP = parseFloat(document.getElementById('downP').value);
+
+    if (isNaN(upP) || isNaN(downP) || upP <= 0 || downP <= 0) {
+      alert('고점과 저점에 0보다 큰 숫자를 입력해 주세요.');
+      return;
+    }
+
+    // 제공된 수식 기반 피보나치 계산: 저점 * pow(고점/저점, 비율)
+    // 고점기준값(0.0), 저점기준값(1.0)
+    const val0_0   = upP; // 고점기준값 (0.0)
+    const val0_618 = downP * Math.pow(upP / downP, 0.618);
+    const val0_382 = downP * Math.pow(upP / downP, 0.382);
+    const val1_0   = downP; // 저점기준값 (1.0)
+
+    // 구간별 정보 정의 (색상 및 차트 내 상대 위치 비율)
+    // 차트 상단(top: 12%)을 고점(upP), 하단(top: 88%)을 저점(downP)으로 배치
+    const levels = [
+      {
+        name: '0.0 (고점 기준)',
+        formula: 'upP (고점)',
+        value: val0_0,
+        color: '#ef5350', // 빨강
+        posRatio: 0.0     // 최상단
+      },
+      {
+        name: '0.618 구간',
+        formula: '저점 * pow(고점/저점, 0.618)',
+        value: val0_618,
+        color: '#ffa726', // 주황
+        posRatio: 1 - 0.618
+      },
+      {
+        name: '0.382 구간',
+        formula: '저점 * pow(고점/저점, 0.382)',
+        value: val0_382,
+        color: '#26a69a', // 초록
+        posRatio: 1 - 0.382
+      },
+      {
+        name: '1.0 (저점 기준)',
+        formula: 'downP (저점)',
+        value: val1_0,
+        color: '#42a5f5', // 파랑
+        posRatio: 1.0     // 최하단
+      }
+    ];
+
+    const chartBox = document.getElementById('chartBox');
+    const tableBody = document.getElementById('tableBody');
+    chartBox.innerHTML = '';
+    tableBody.innerHTML = '';
+
+    const topPadding = 14; // 상단 여백 (%)
+    const usableHeight = 76; // 라인이 그려질 높이 비율 (%)
+
+    // 1. 구간별 배경 영역 채우기
+    for (let i = 0; i < levels.length - 1; i++) {
+      const top1 = topPadding + (levels[i].posRatio * usableHeight);
+      const top2 = topPadding + (levels[i + 1].posRatio * usableHeight);
+      const zone = document.createElement('div');
+      zone.className = 'fib-zone';
+      zone.style.top = top1 + '%';
+      zone.style.height = (top2 - top1) + '%';
+      zone.style.backgroundColor = levels[i].color;
+      zone.style.opacity = '0.08';
+      chartBox.appendChild(zone);
+    }
+
+    // 2. 구분별 라인 및 수치 텍스트 그리기
+    levels.forEach(item => {
+      const topPercent = topPadding + (item.posRatio * usableHeight);
+      const formattedVal = Number(item.value.toFixed(4)).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
+
+      // 차트 라인 생성
+      const line = document.createElement('div');
+      line.className = 'fib-line';
+      line.style.top = topPercent + '%';
+      line.style.borderColor = item.color;
+
+      // 차트 라벨 생성
+      const label = document.createElement('div');
+      label.className = 'fib-label';
+      label.style.top = topPercent + '%';
+      label.innerHTML = `
+        <span style="color: ${item.color};">${item.name}</span>
+        <span style="background: ${item.color}; padding: 1px 6px; border-radius: 3px;">${formattedVal}</span>
+      `;
+
+      chartBox.appendChild(line);
+      chartBox.appendChild(label);
+
+      // 하단 표 행 추가
+      const row = `
+        <tr>
+          <td><span class="badge" style="background-color: ${item.color};">${item.name}</span></td>
+          <td style="color: #666; font-family: monospace;">${item.formula}</td>
+          <td style="font-weight: bold;">${formattedVal}</td>
+        </tr>
+      `;
+      tableBody.innerHTML += row;
+    });
+  }
+</script>
+
+</body>
+</html>
