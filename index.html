@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>피보나치 구간 계산기 및 라인 차트</title>
+  <title>피보나치 구간 계산기 (0.0 → 0.618 → 0.382 → 1.0)</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -25,6 +25,16 @@
       text-align: center;
       color: #1a73e8;
       font-size: 22px;
+    }
+    .order-info {
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      background: #f1f3f4;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 18px;
+      font-weight: bold;
     }
     .input-group {
       display: flex;
@@ -66,7 +76,7 @@
     /* 라인 차트 영역 */
     .chart-box {
       position: relative;
-      height: 340px;
+      height: 360px;
       background: #1e222d;
       border-radius: 8px;
       margin-top: 24px;
@@ -95,7 +105,7 @@
       font-size: 13px;
       font-weight: bold;
       color: #fff;
-      margin-top: -4px;
+      margin-top: -5px;
       display: flex;
       justify-content: space-between;
       width: calc(100% - 50px);
@@ -118,7 +128,7 @@
     }
     .badge {
       display: inline-block;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 4px;
       color: white;
       font-weight: bold;
@@ -130,28 +140,32 @@
 
 <div class="card">
   <h2>📈 피보나치 구간 계산 및 라인 차트</h2>
+  <div class="order-info">
+    구간 순서 (상 → 하): 0.0 (고점) ➔ 0.618 ➔ 0.382 ➔ 1.0 (저점)
+  </div>
 
   <div class="input-group">
     <div class="input-field">
-      <label for="upP">고점 기준값 (upP / 0.0 기준)</label>
+      <label for="upP">고점 기준값 (upP / 0.0)</label>
       <input type="number" id="upP" placeholder="예: 10000" value="10000" step="any">
     </div>
     <div class="input-field">
-      <label for="downP">저점 기준값 (downP / 1.0 기준)</label>
+      <label for="downP">저점 기준값 (downP / 1.0)</label>
       <input type="number" id="downP" placeholder="예: 5000" value="5000" step="any">
     </div>
   </div>
 
   <button onclick="drawFibonacci()">계산 및 라인 그리기</button>
 
-  <!-- 구분별 라인이 그려지는 차트 영역 -->
+  <!-- 구분별 라인이 그려지는 차트 영역 (0.0 -> 0.618 -> 0.382 -> 1.0 순서) -->
   <div class="chart-box" id="chartBox"></div>
 
-  <!-- 수치 요약 표 -->
+  <!-- 수치 요약 표 (0.0 -> 0.618 -> 0.382 -> 1.0 순서) -->
   <table>
     <thead>
       <tr>
-        <th>구분</th>
+        <th>순서</th>
+        <th>구간 구분</th>
         <th>적용 수식</th>
         <th>계산 결과값</th>
       </tr>
@@ -174,43 +188,49 @@
       return;
     }
 
-    // 제공된 수식 기반 피보나치 계산: 저점 * pow(고점/저점, 비율)
-    // 고점기준값(0.0), 저점기준값(1.0)
-    const val0_0   = upP; // 고점기준값 (0.0)
+    // 0.0 -> 0.618 -> 0.382 -> 1.0 순서대로 값 계산
+    const val0_0   = upP;
     const val0_618 = downP * Math.pow(upP / downP, 0.618);
     const val0_382 = downP * Math.pow(upP / downP, 0.382);
-    const val1_0   = downP; // 저점기준값 (1.0)
+    const val1_0   = downP;
 
-    // 구간별 정보 정의 (색상 및 차트 내 상대 위치 비율)
-    // 차트 상단(top: 12%)을 고점(upP), 하단(top: 88%)을 저점(downP)으로 배치
+    // 위에서 아래로 0.0 -> 0.618 -> 0.382 -> 1.0 순서 고정 배열
     const levels = [
       {
-        name: '0.0 (고점 기준)',
-        formula: 'upP (고점)',
+        order: 1,
+        name: '0.0',
+        desc: '0.0 (고점 기준)',
+        formula: '고점 (upP)',
         value: val0_0,
         color: '#ef5350', // 빨강
-        posRatio: 0.0     // 최상단
+        posRatio: 0.0     // 맨 위 (0%)
       },
       {
-        name: '0.618 구간',
+        order: 2,
+        name: '0.618',
+        desc: '0.618 구간',
         formula: '저점 * pow(고점/저점, 0.618)',
         value: val0_618,
         color: '#ffa726', // 주황
-        posRatio: 1 - 0.618
+        posRatio: 1 - 0.618 // 위에서 38.2% 지점
       },
       {
-        name: '0.382 구간',
+        order: 3,
+        name: '0.382',
+        desc: '0.382 구간',
         formula: '저점 * pow(고점/저점, 0.382)',
         value: val0_382,
         color: '#26a69a', // 초록
-        posRatio: 1 - 0.382
+        posRatio: 1 - 0.382 // 위에서 61.8% 지점
       },
       {
-        name: '1.0 (저점 기준)',
-        formula: 'downP (저점)',
+        order: 4,
+        name: '1.0',
+        desc: '1.0 (저점 기준)',
+        formula: '저점 (downP)',
         value: val1_0,
         color: '#42a5f5', // 파랑
-        posRatio: 1.0     // 최하단
+        posRatio: 1.0     // 맨 아래 (100%)
       }
     ];
 
@@ -219,10 +239,10 @@
     chartBox.innerHTML = '';
     tableBody.innerHTML = '';
 
-    const topPadding = 14; // 상단 여백 (%)
-    const usableHeight = 76; // 라인이 그려질 높이 비율 (%)
+    const topPadding = 14;   // 차트 상단 여백 (%)
+    const usableHeight = 76; // 차트 내부 라인 표시 높이 비율 (%)
 
-    // 1. 구간별 배경 영역 채우기
+    // 1. 구간별 배경 영역 칠하기
     for (let i = 0; i < levels.length - 1; i++) {
       const top1 = topPadding + (levels[i].posRatio * usableHeight);
       const top2 = topPadding + (levels[i + 1].posRatio * usableHeight);
@@ -235,35 +255,36 @@
       chartBox.appendChild(zone);
     }
 
-    // 2. 구분별 라인 및 수치 텍스트 그리기
+    // 2. 0.0 -> 0.618 -> 0.382 -> 1.0 순서로 라인 및 표 생성
     levels.forEach(item => {
       const topPercent = topPadding + (item.posRatio * usableHeight);
       const formattedVal = Number(item.value.toFixed(4)).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 
-      // 차트 라인 생성
+      // 차트 수평 라인
       const line = document.createElement('div');
       line.className = 'fib-line';
       line.style.top = topPercent + '%';
       line.style.borderColor = item.color;
 
-      // 차트 라벨 생성
+      // 차트 텍스트 라벨
       const label = document.createElement('div');
       label.className = 'fib-label';
       label.style.top = topPercent + '%';
       label.innerHTML = `
-        <span style="color: ${item.color};">${item.name}</span>
-        <span style="background: ${item.color}; padding: 1px 6px; border-radius: 3px;">${formattedVal}</span>
+        <span style="color: ${item.color};">[${item.order}] ${item.desc}</span>
+        <span style="background: ${item.color}; padding: 1px 8px; border-radius: 3px;">${formattedVal}</span>
       `;
 
       chartBox.appendChild(line);
       chartBox.appendChild(label);
 
-      // 하단 표 행 추가
+      // 하단 요약 표 행 추가
       const row = `
         <tr>
+          <td><strong>${item.order}</strong></td>
           <td><span class="badge" style="background-color: ${item.color};">${item.name}</span></td>
-          <td style="color: #666; font-family: monospace;">${item.formula}</td>
-          <td style="font-weight: bold;">${formattedVal}</td>
+          <td style="color: #555; font-family: monospace;">${item.formula}</td>
+          <td style="font-weight: bold; font-size: 15px;">${formattedVal}</td>
         </tr>
       `;
       tableBody.innerHTML += row;
