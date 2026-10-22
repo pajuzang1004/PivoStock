@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>주식 계산기 메뉴</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+      background-color: #121826;
+      color: #ffffff;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 32px;
+      color: #e2e8f0;
+      text-align: center;
+    }
+    .btn-wrap {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .link-btn {
+      display: block;
+      width: 100%;
+      padding: 22px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      color: #ffffff;
+      border-radius: 14px;
+      transition: transform 0.1s;
+    }
+    .link-btn:active {
+      transform: scale(0.97);
+    }
+    .btn-1 {
+      background-color: #2563eb; /* 파란색 버튼 */
+    }
+    .btn-2 {
+      background-color: #10b981; /* 초록색 버튼 */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 주식 계산기 선택</h1>
+
+  <div class="btn-wrap">
+    <a href="Stock1.html" class="link-btn btn-1">계산기 1 (Stock1)</a>
+    <a href="Stock2.html" class="link-btn btn-2">계산기 2 (Stock2)</a>
+  </div>
+
+</body>
+</html>
