@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>초간편 1/2 수량 물타기 계산기</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        krRed: '#f04452',
+                        krBlue: '#3182f6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4 transition-colors">
+
+    <!-- 단일 카드 형태의 초간편 계산기 -->
+    <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 space-y-6">
+        
+        <!-- 상단 타이틀 & 다크모드 버튼 -->
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-blue-500"></i>
+                    간편 물타기 계산기
+                </h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">숫자 3개만 입력하면 1/2 수량 공식으로 자동 계산됩니다</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <button onclick="resetCalc()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">
+                    초기화
+                </button>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-amber-400 flex items-center justify-center">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. 입력 영역 (딱 3개) -->
+        <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <!-- 내 평단가 -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">1. 내 평단가</label>
+                    <div class="relative">
+                        <input type="text" id="pCur" value="10,000" oninput="onInputFormat(this)"
+                            class="w-full pl-3 pr-8 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-right font-bold text-base focus:outline-none focus:border-blue-500">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">원</span>
+                    </div>
+                </div>
+
+                <!-- 보유 수량 -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">2. 현재 보유 수량</label>
+                    <div class="relative">
+                        <input type="text" id="qCur" value="100" oninput="onInputFormat(this)"
+                            class="w-full pl-3 pr-8 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-right font-bold text-base focus:outline-none focus:border-blue-500">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">주</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 물타기할 현재 주가 -->
+            <div>
+                <div class="flex justify-between items-center mb-1.5">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400">3. 물타기할 현재 주가</label>
+                    <span id="dropRateText" class="text-xs font-bold text-krBlue">평단 대비 -20.0%</span>
+                </div>
+                <div class="relative">
+                    <input type="text" id="pNow" value="8,000" oninput="onInputFormat(this)"
+                        class="w-full pl-4 pr-10 py-3.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/30 border-2 border-blue-400 dark:border-blue-600 text-right font-extrabold text-lg text-blue-600 dark:text-blue-400 focus:outline-none">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold">원</span>
+                </div>
+                <!-- 빠른 하락률 선택 버튼 -->
+                <div class="grid grid-cols-4 gap-2 mt-2">
+                    <button onclick="setDrop(-5)" class="py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-xs font-bold text-krBlue transition">-5%</button>
+                    <button onclick="setDrop(-10)" class="py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-xs font-bold text-krBlue transition">-10%</button>
+                    <button onclick="setDrop(-20)" class="py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-xs font-bold text-krBlue transition">-20%</button>
+                    <button onclick="setDrop(-30)" class="py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-xs font-bold text-krBlue transition">-30%</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 핵심 결과: 수량의 1/2 물타기 -->
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg space-y-4">
+            <div class="flex items-center justify-between border-b border-white/15 pb-3">
+                <span class="text-xs font-bold bg-white/20 px-2.5 py-1 rounded-full">추천 · 현재 수량의 1/2 물타기</span>
+                <span class="text-xs text-blue-100 font-mono">공식: (2×평단 + 현재가) ÷ 3</span>
+            </div>
+
+            <div class="flex items-baseline justify-between">
+                <span class="text-sm text-blue-100 font-medium">물타기 후 새 평단가</span>
+                <div class="text-right">
+                    <span id="halfNewAvg" class="text-3xl font-extrabold">9,333</span>
+                    <span class="text-sm font-medium">원</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-white/15 text-center">
+                <div class="bg-black/15 rounded-xl p-2.5">
+                    <span class="text-[11px] text-blue-100 block">추가 매수 수량</span>
+                    <span id="halfAddQty" class="text-sm sm:text-base font-extrabold mt-0.5 block">+50주</span>
+                </div>
+                <div class="bg-black/15 rounded-xl p-2.5">
+                    <span class="text-[11px] text-blue-100 block">필요한 현금</span>
+                    <span id="halfAddCost" class="text-sm sm:text-base font-extrabold mt-0.5 block">400,000원</span>
+                </div>
+                <div class="bg-black/15 rounded-xl p-2.5">
+                    <span class="text-[11px] text-blue-100 block">본전 탈출 반등폭</span>
+                    <span id="halfRebound" class="text-sm sm:text-base font-extrabold text-amber-300 mt-0.5 block">+16.7%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 한눈에 비교: 수량 1/2 vs 금액 2배 -->
+        <div class="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200 dark:border-slate-800">
+            <h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 flex items-center justify-between">
+                <span>💡もし 금액을 2배로 물을 탄다면? (1회 비교)</span>
+                <span id="beforeReboundText" class="text-[11px] text-slate-400">물타기 전 탈출: +25.0%</span>
+            </h2>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+                <!-- 수량 1/2 요약 -->
+                <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-900/60">
+                    <div class="font-bold text-blue-600 dark:text-blue-400 mb-2">수량의 1/2 매수 (안전)</div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-slate-400">추가 현금:</span>
+                        <span id="cmpHalfCost" class="font-bold">400,000원</span>
+                    </div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-slate-400">새 평단가:</span>
+                        <span id="cmpHalfAvg" class="font-bold">9,333원</span>
+                    </div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-slate-400">본전 반등:</span>
+                        <span id="cmpHalfReb" class="font-bold text-krRed">+16.7%</span>
+                    </div>
+                </div>
+
+                <!-- 금액 2배 요약 -->
+                <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900/60">
+                    <div class="font-bold text-amber-600 dark:text-amber-400 mb-2">금액을 2배 매수 (공격)</div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-slate-400">추가 현금:</span>
+                        <span id="cmpDoubleCost" class="font-bold">2,000,000원</span>
+                    </div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-slate-400">새 평단가:</span>
+                        <span id="cmpDoubleAvg" class="font-bold">8,571원</span>
+                    </div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-slate-400">본전 반등:</span>
+                        <span id="cmpDoubleReb" class="font-bold text-krRed">+7.1%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function parseNum(str) {
+            return parseFloat(String(str).replace(/[^\d]/g, '')) || 0;
+        }
+
+        function fmt(num) {
+            return Math.round(num).toLocaleString('ko-KR');
+        }
+
+        function onInputFormat(el) {
+            const v = parseNum(el.value);
+            el.value = v > 0 ? v.toLocaleString('ko-KR') : '';
+            calculate();
+        }
+
+        function setDrop(pct) {
+            const pCur = parseNum(document.getElementById('pCur').value);
+            if (!pCur) return;
+            const pNow = Math.max(1, Math.round(pCur * (1 + pct / 100)));
+            document.getElementById('pNow').value = fmt(pNow);
+            calculate();
+        }
+
+        function resetCalc() {
+            document.getElementById('pCur').value = '10,000';
+            document.getElementById('qCur').value = '100';
+            document.getElementById('pNow').value = '8,000';
+            calculate();
+        }
+
+        function calculate() {
+            const pCur = parseNum(document.getElementById('pCur').value);
+            const qCur = parseNum(document.getElementById('qCur').value);
+            const pNow = parseNum(document.getElementById('pNow').value);
+
+            if (!pCur || !qCur || !pNow) return;
+
+            const cCur = pCur * qCur;
+            const dropPct = ((pNow - pCur) / pCur) * 100;
+            const beforeReb = ((pCur - pNow) / pNow) * 100;
+
+            // 상단 하락률 표시
+            const dropEl = document.getElementById('dropRateText');
+            dropEl.textContent = `평단 대비 ${dropPct > 0 ? '+' : ''}${dropPct.toFixed(1)}%`;
+            dropEl.className = `text-xs font-bold ${dropPct < 0 ? 'text-krBlue' : 'text-krRed'}`;
+            document.getElementById('beforeReboundText').textContent = `물타기 전 탈출: +${Math.max(0, beforeReb).toFixed(1)}%`;
+
+            // 1) 수량 1/2 물타기 계산: 공식 (2 * P_cur + P_now) / 3
+            const halfAddQty = Math.max(1, Math.round(qCur * 0.5));
+            const halfAddCost = halfAddQty * pNow;
+            const halfNewAvg = (cCur + halfAddCost) / (qCur + halfAddQty);
+            const halfReb = ((halfNewAvg - pNow) / pNow) * 100;
+
+            document.getElementById('halfNewAvg').textContent = fmt(halfNewAvg);
+            document.getElementById('halfAddQty').textContent = `+${fmt(halfAddQty)}주`;
+            document.getElementById('halfAddCost').textContent = `${fmt(halfAddCost)}원`;
+            document.getElementById('halfRebound').textContent = `+${Math.max(0, halfReb).toFixed(1)}%`;
+
+            // 2) 금액 2배 물타기 계산 (비교용)
+            const doubleTargetCost = cCur * 2;
+            const doubleAddQty = Math.max(1, Math.round(doubleTargetCost / pNow));
+            const doubleAddCost = doubleAddQty * pNow;
+            const doubleNewAvg = (cCur + doubleAddCost) / (qCur + doubleAddQty);
+            const doubleReb = ((doubleNewAvg - pNow) / pNow) * 100;
+
+            // 하단 비교 카드 업데이트
+            document.getElementById('cmpHalfCost').textContent = `${fmt(halfAddCost)}원`;
+            document.getElementById('cmpHalfAvg').textContent = `${fmt(halfNewAvg)}원`;
+            document.getElementById('cmpHalfReb').textContent = `+${Math.max(0, halfReb).toFixed(1)}%`;
+
+            document.getElementById('cmpDoubleCost').textContent = `${fmt(doubleAddCost)}원 (${fmt(doubleAddQty)}주)`;
+            document.getElementById('cmpDoubleAvg').textContent = `${fmt(doubleNewAvg)}원`;
+            document.getElementById('cmpDoubleReb').textContent = `+${Math.max(0, doubleReb).toFixed(1)}%`;
+        }
+
+        window.onload = calculate;
+    </script>
+</body>
+</html>
